@@ -42,14 +42,15 @@ int pos_terminal = 0;
 
 /*****    VARIABLES GLOBALES    *****/
 String cad = "";
+String test = "";
 
 void setup() {
   Serial.begin(9600);
 
   //INTERRUPCIONES
   attachInterrupt(0, base, CHANGE);
-  attachInterrupt(1, brazo, CHANGE);
-  attachInterrupt(2, terminal, CHANGE);
+  attachInterrupt(1, brazo, RISING);
+  attachInterrupt(2, terminal, RISING);
 
   //DECLARACIÓN MOVIMIENTOS
   pinMode(baseHorario, OUTPUT);
@@ -74,33 +75,43 @@ void loop() {
     
     cad = Serial.readString();
     Info(cad);
-    //Motor Base
-    if(m1>0){
-      Serial.println("Moviendo Base sentido antihorario");
-      mueveBaseAntihorario(m1);
+    if(m1 == 0 && m2 == 0 && m3 == 0){
+      Serial.println("No hay movimiento");
     }else{
-      Serial.println("Moviendo Base sentido horario");
-      mueveBaseHorario(-1*m1);
+      //Motor Base
+      if(m1>0){
+        Serial.println("Moviendo Base sentido antihorario");
+        Serial.print("Contenido M1:"); Serial.println(m1);
+        mueveBaseAntihorario(m1);
+      }else if(m1<0){
+        Serial.println("Moviendo Base sentido horario");
+        Serial.print("Contenido M1:"); Serial.println(m1);
+        mueveBaseHorario(-1*m1);
+      }
+  
+      //Motor Brazo
+      if(m2>0){
+        Serial.println("Moviendo Brazo sentido antihorario");
+        Serial.print("Contenido M2:"); Serial.println(m2);
+        mueveBrazoAntihorario(m2);
+      }else if(m2<0){
+        Serial.println("Moviendo Brazo sentido horario");
+        Serial.print("Contenido M2:"); Serial.println(m2);
+        mueveBrazoHorario(-1*m2);
+      }
+  
+      //Motor Terminal
+      if(m3>0){
+        Serial.println("Moviendo Terminal sentido antihorario");
+        Serial.print("Contenido M3:"); Serial.println(m3);
+        mueveTerminalAntihorario(m3);
+      }else if(m3<0){
+        Serial.println("Moviendo Terminal sentido horario");
+        Serial.print("Contenido M3:"); Serial.println(m3);
+        mueveTerminalHorario(-1*m3);
+      }
     }
-
-    //Motor Brazo
-    if(m2>0){
-      Serial.println("Moviendo Brazo sentido antihorario");
-      mueveBrazoAntihorario(m2);
-    }else{
-      Serial.println("Moviendo Brazo sentido horario");
-      mueveBrazoHorario(-1*m2);
-    }
-
-    //Motor Terminal
-    if(m3>0){
-      Serial.println("Moviendo Terminal sentido antihorario");
-      mueveTerminalAntihorario(m3);
-    }else{
-      Serial.println("Moviendo Terminal sentido horario");
-      mueveTerminalHorario(-1*m3);
-    }
-  }
+  }  
 }
 
 void mueveBaseAntihorario(int grados){
@@ -112,6 +123,8 @@ void mueveBaseAntihorario(int grados){
     }else{
       digitalWrite(baseHorario, HIGH); //REVISAR
       digitalWrite(baseAntihorario, LOW);
+      grados--;
+      Serial.println(grados);
     }
   }
   stopBase();
@@ -126,6 +139,8 @@ void mueveBaseHorario(int grados){
     }else{
       digitalWrite(baseAntihorario, HIGH); //REVISAR
       digitalWrite(baseHorario, LOW);
+      grados--;
+      Serial.println(grados);
     }
   }
   stopBase();
@@ -144,7 +159,9 @@ void mueveBrazoAntihorario(int grados){
       cont_brazo = grados;
     }else{
       digitalWrite(brazoAntihorario, HIGH);
-      digitalWrite(brazoHorario, LOW); 
+      digitalWrite(brazoHorario, LOW);
+      grados--; 
+      Serial.println(grados);
     }
   }
   stopBrazo();
@@ -159,6 +176,8 @@ void mueveBrazoHorario(int grados){
     }else{
       digitalWrite(brazoHorario, HIGH);
       digitalWrite(brazoAntihorario, LOW); 
+      grados--;
+      Serial.println(grados);
     }
   }
   stopBrazo();
@@ -176,8 +195,10 @@ void mueveTerminalAntihorario(int grados){
     if(digitalRead(finTerminal)==HIGH){
       cont_terminal = grados;
     }else{
-      digitalWrite(terminalHorario, HIGH);
-      digitalWrite(terminalAntihorario, LOW);
+      digitalWrite(terminalAntihorario, HIGH);
+      digitalWrite(terminalHorario, LOW);
+      grados--;
+      Serial.println(grados);
     }
   }
   stopTerminal();
@@ -190,8 +211,10 @@ void mueveTerminalHorario(int grados){
     if(digitalRead(finTerminal)==HIGH){
       cont_terminal = grados;
     }else{
-      digitalWrite(terminalAntihorario, HIGH);
-      digitalWrite(terminalHorario, LOW);
+      digitalWrite(terminalHorario, HIGH);
+      digitalWrite(terminalAntihorario, LOW);
+      grados--;
+      Serial.println(grados);
     }
   }
   stopTerminal();
@@ -204,17 +227,17 @@ void stopTerminal(){
 
 void base(){
   cont_base++;
-  Serial.println("BASE");
+  //Serial.println("BASE");
 }
 
 void brazo(){
   cont_brazo++;
-  Serial.println("BRAZO");
+  //Serial.println("BRAZO");
 }
 
 void terminal(){
   cont_terminal++;
-  Serial.println("TERMINAL");
+  //Serial.println("TERMINAL");
 }
 
 void Info(String cad){
@@ -222,6 +245,7 @@ void Info(String cad){
   int m[4];
   char str[25]={'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
   cad.toCharArray(str, cad.length()+1);
+  Serial.print("MENSAJE:     ");Serial.println(str);
   int j = 0;
   int k = 0;
 
@@ -235,7 +259,7 @@ void Info(String cad){
     }
     j++;
   }
-  m[3]=aux.toInt();
+  m[2]=aux.toInt();
   m1 = m[0];
   m2 = m[1];
   m3 = m[2];
@@ -243,4 +267,8 @@ void Info(String cad){
 
 void inicializar(){
   // METODOS PARA INICIALIZAR ROBOT
+  cad = "";
+  m1 = 0;
+  m2 = 0;
+  m3 = 0;
 }
