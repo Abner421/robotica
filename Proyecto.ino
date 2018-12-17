@@ -43,6 +43,7 @@ int pos_terminal = 0;
 /*****    VARIABLES GLOBALES    *****/
 String cad = "";
 String test = "";
+int grados = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -114,9 +115,11 @@ void loop() {
   }  
 }
 
-void mueveBaseAntihorario(int grados){
+void mueveBaseAntihorario(int pulsos){
   cont_base = 0;
   delay(420);
+
+  grados = pulsos * 18;
   while(grados > cont_base){
     if(digitalRead(finBase)==HIGH){
       cont_base = grados;
@@ -130,9 +133,11 @@ void mueveBaseAntihorario(int grados){
   stopBase();
 }
 
-void mueveBaseHorario(int grados){
+void mueveBaseHorario(int pulsos){
   cont_base = 0;
   delay(420);
+
+  grados = pulsos * 18;
   while(grados > cont_base){
     if(digitalRead(inicioBase)==HIGH){
       cont_base = grados;
@@ -151,9 +156,10 @@ void stopBase(){
   digitalWrite(baseAntihorario, LOW);
 }
 
-void mueveBrazoAntihorario(int grados){
+void mueveBrazoAntihorario(int pulsos){
   cont_brazo = 0;
   delay(420);
+  grados = pulsos * 5;
   while(grados > cont_brazo){
     if(digitalRead(finBrazo)==HIGH){
       cont_brazo = grados;
@@ -167,9 +173,10 @@ void mueveBrazoAntihorario(int grados){
   stopBrazo();
 }
 
-void mueveBrazoHorario(int grados){
+void mueveBrazoHorario(int pulsos){
   cont_brazo = 0;
   delay(420);
+  grados = pulsos * 8;
   while(grados > cont_brazo){
     if(digitalRead(finBrazo)==HIGH){
       cont_brazo = grados;
@@ -188,9 +195,10 @@ void stopBrazo(){
   digitalWrite(brazoHorario, LOW);
 }
 
-void mueveTerminalAntihorario(int grados){
+void mueveTerminalAntihorario(int pulsos){
   cont_terminal = 0;
   delay(420);
+  grados = pulsos * 7;
   while(grados > cont_terminal){
     if(digitalRead(finTerminal)==HIGH){
       cont_terminal = grados;
@@ -204,9 +212,10 @@ void mueveTerminalAntihorario(int grados){
   stopTerminal();
 }
 
-void mueveTerminalHorario(int grados){
+void mueveTerminalHorario(int pulsos){
   cont_terminal = 0;
   delay(420);
+  grados = pulsos * 6;
   while(grados > cont_terminal){
     if(digitalRead(finTerminal)==HIGH){
       cont_terminal = grados;
@@ -266,9 +275,14 @@ void Info(String cad){
 }
 
 void inicializar(){
-  // METODOS PARA INICIALIZAR ROBOT
+  // INICIALIZAR VARIABLES ROBOT
   cad = "";
   m1 = 0;
   m2 = 0;
   m3 = 0;
+  grados = 0;
+}
+
+void Grados(int pulsos){
+  
 }
