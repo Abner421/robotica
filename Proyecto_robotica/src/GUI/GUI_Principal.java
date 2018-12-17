@@ -28,6 +28,10 @@ public class GUI_Principal extends javax.swing.JFrame {
   String grados2;
   String grados3;
 
+  int grados1_aux = 0;
+  int grados2_aux = 0;
+  int grados3_aux = 0;
+
   private SerialPortEventListener listener = new SerialPortEventListener() {
     @Override
     public void serialEvent(SerialPortEvent spe) {
@@ -671,42 +675,81 @@ public class GUI_Principal extends javax.swing.JFrame {
 
   private void btn_startActionPerformed(java.awt.event.ActionEvent evt) {                                          
     // TODO add your handling code here:
+
     grados1 = txt_motor1.getValue() + ""; //Convierte el valor a cadena
     grados2 = txt_motor2.getValue() + "";
     grados3 = txt_motor3.getValue() + "";
-    
-    int grad1 = (int) txt_motor1.getValue();
-    int grad2 = (int) txt_motor2.getValue();
-    int grad3 = (int) txt_motor3.getValue();
-    
+
+    int grad1_aux = (int) txt_motor1.getValue();
+    int grad2_aux = (int) txt_motor2.getValue();
+    int grad3_aux = (int) txt_motor3.getValue();
+
     //System.out.println("Valor obtenido: "+grad1);
     if ((txt_motor1.getValue() + "").equals("")) {
       grados1 = "0";
-    }else{
-      txt_pos1.setText(grados1+"°");
+    } else {
+      //grados1_aux = grados1_aux + grad1_aux;
+      //txt_pos1.setText(grados1_aux + "°");
     }
-    
+
     if ((txt_motor2.getValue() + "").equals("")) {
       grados2 = "0";
-    }else{
-      txt_pos2.setText(grados2+"°");
+    } else {
+      //grados2_aux = grados2_aux + grad2_aux;
+     // txt_pos2.setText(grados2_aux + "°");
     }
-    
+
     if ((txt_motor3.getValue() + "").equals("")) {
       grados3 = "0";
-    }else{
-      txt_pos3.setText(grados3+"°");
+    } else {
+      //grados3_aux = grados3_aux + grad3_aux;
+     // txt_pos3.setText(grados3_aux + "°");
     }
-   
-    try{
-      ino.sendData(grados1+","+grados2+","+grados3);
-      System.out.println("Datos enviados: " + grados1+","+grados2+","+grados3);
-      JOptionPane.showMessageDialog(null, "Realizando movimiento...","Mensaje",JOptionPane.PLAIN_MESSAGE);
-      if(ino.isMessageAvailable()){
-        System.out.println(ino.printMessage());
+
+    //Motor base no puede exceder 180° (90° en pos Inicial)
+    //Motor Brazo no puede exceder 110° (~60° en pos Inicial)
+    //Motor Terminal no puede exceder 180° (90° en pos Inicial)
+    if (grados1_aux == 0 && grad1_aux <= 90) {
+      grados1_aux = grados1_aux + grad1_aux;
+      grados2_aux = grados2_aux + grad2_aux;
+      grados3_aux = grados3_aux + grad3_aux;
+      try {
+        ino.sendData(grados1 + "," + grados2 + "," + grados3);
+        System.out.println("Datos enviados: " + grados1 + "," + grados2 + "," + grados3);
+        System.out.println("Grados a mostrar: " + grad1_aux + "," + grad2_aux + "," + grad3_aux);
+        System.out.println("Suma de datos (base):" + grados1_aux);
+        txt_pos1.setText(grados1_aux + "°");
+        JOptionPane.showMessageDialog(null, "Realizando movimiento...", "Mensaje", JOptionPane.PLAIN_MESSAGE);
+        if (ino.isMessageAvailable()) {
+          System.out.println(ino.printMessage());
+        }
+
+      } catch (ArduinoException | SerialPortException ex) {
+        Logger.getLogger(GUI_Principal.class.getName()).log(Level.SEVERE, null, ex);
       }
-    }catch (ArduinoException | SerialPortException ex){
-      Logger.getLogger(GUI_Principal.class.getName()).log(Level.SEVERE, null, ex);
+
+    } else {
+      if ((grados1_aux + grad1_aux) >= 180) {
+
+        JOptionPane.showMessageDialog(null, "No se puede realizar el movimiento porque excede la capcidad del robot", "ADVERTENCIA!", JOptionPane.WARNING_MESSAGE);
+      } else {
+        grados1_aux = grados1_aux + grad1_aux;
+        grados2_aux = grados2_aux + grad2_aux;
+        grados3_aux = grados3_aux + grad3_aux;
+        try {
+          ino.sendData(grados1 + "," + grados2 + "," + grados3);
+          System.out.println("Datos enviados: " + grados1 + "," + grados2 + "," + grados3);
+          System.out.println("Grados a mostrar: " + grad1_aux + "," + grad2_aux + "," + grad3_aux);
+          System.out.println("Suma de datos (base):" + grados1_aux);
+          txt_pos1.setText(grados1_aux + "°");
+          JOptionPane.showMessageDialog(null, "Realizando movimiento...", "Mensaje", JOptionPane.PLAIN_MESSAGE);
+          if (ino.isMessageAvailable()) {
+            System.out.println(ino.printMessage());
+          }
+        } catch (ArduinoException | SerialPortException ex) {
+          Logger.getLogger(GUI_Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+      }
     }
   }                                         
 
